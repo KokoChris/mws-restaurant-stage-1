@@ -1,12 +1,15 @@
 self.addEventListener("fetch", function(event) {
   event.respondWith(
     caches.match(event.request).then(response => {
+      // in case we get a response from the cache return the cached asset
       if (response) {
         return response;
       }
 
+      //if the asset is not in the cache fetch it first, then cache it and then return it.
       return fetch(event.request).then(res =>
         caches.open("dynamic").then(function(cache) {
+          //res clone is needed here since the res is consumed if used
           cache.put(event.request.url, res.clone());
           return res;
         })
